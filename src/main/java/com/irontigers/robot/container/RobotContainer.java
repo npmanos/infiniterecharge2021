@@ -18,6 +18,7 @@ import java.util.function.BiConsumer;
 
 import com.irontigers.robot.Constants;
 import com.irontigers.robot.Robot;
+import com.irontigers.robot.commands.IntakeControl;
 import com.irontigers.robot.old.commands.AutonomousDrive;
 import com.irontigers.robot.old.commands.JoystickDriveCommand;
 import com.irontigers.robot.old.commands.RotateTurret;
@@ -72,13 +73,7 @@ public class RobotContainer {
   private BallPresenceTrigger bottomBallSensor = new BallPresenceTrigger(magSystem.getBottomBallSensor());
   private MedianFilter bottomSensorFilter = new MedianFilter(5);
 
-  private ConditionalCommand intakeSwitchCommand = new ConditionalCommand(new SequentialCommandGroup( // onTrue
-      new InstantCommand(magSystem::disableIntake, magSystem),
-      new InstantCommand(magSystem::disableMagazine, magSystem)),
-      new SequentialCommandGroup( // onFalse
-          new InstantCommand(magSystem::enableMagazine, magSystem),
-          new InstantCommand(magSystem::enableIntake, magSystem)),
-      magSystem::isMagFull);
+  private IntakeControl intakeSwitchCommand = new IntakeControl(magSystem);
 
   private SequentialCommandGroup shootOnceCommand = new SequentialCommandGroup(
       new InstantCommand(visionSystem::setToVision), new VisionAim(shooterSystem, visionSystem),
@@ -128,14 +123,6 @@ public class RobotContainer {
     // bottomBallSensor.whenInactive(magSystem::incrementBalls, magSystem);
   }
 
-  public boolean isTurretLeftButtonPressed() {
-    return buttons.turretLeft.get();
-  }
-
-  public boolean isTurretRightButtonPressed() {
-    return buttons.turretRight.get();
-  }
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -150,12 +137,6 @@ public class RobotContainer {
   //       new VisionAim(shooterSystem, visionSystem), getShootAllCommand(), new InstantCommand(visionSystem::disableLeds),
   //       new InstantCommand(visionSystem::setToDriving));
   // }
-
-  private Command simpleShoot() {
-    return new InstantCommand();
-  }
-
-//////////////////////////////////////////
 
 
  /**
@@ -253,14 +234,10 @@ public class RobotContainer {
     
   }
 
-  private Command MagazineOn() {
-    InstantCommand magON = new InstantCommand(magSystem::enableMagazine);
-    return magON;
-  }
-
   // Shoots all the balls
   private Command getShootAllCommand() {
     SequentialCommandGroup shootAllCommand = new SequentialCommandGroup(new VisionAim(shooterSystem, visionSystem));
+    
     for (int i = 0; i < magSystem.getStoredBalls(); i++) {
       shootAllCommand = shootAllCommand.andThen(new Shoot(magSystem, shooterSystem, visionSystem, topBallSensor));
     }
@@ -268,10 +245,6 @@ public class RobotContainer {
     return shootAllCommand.andThen(new InstantCommand(magSystem::closeGate, magSystem), new WaitCommand(0.5),
         new StopShooter(shooterSystem), new InstantCommand(visionSystem::setToDriving));
 
-  }
-  private Command voluntaryIntakeCommand() {
-    SequentialCommandGroup intakeCommand = new SequentialCommandGroup(new InstantCommand(magSystem::enableIntake, magSystem), new WaitCommand(5), new InstantCommand(magSystem::disableIntake, magSystem));
-    return intakeCommand;
   }
 
   public VisionSystem getVisionSystem() {
