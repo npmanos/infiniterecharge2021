@@ -27,6 +27,8 @@ public class IntakeControl extends ConditionalCommand {
 
         // Condition
         magSystem::isMagFull);
+
+        addRequirements(magSystem);
   }
 
 }
