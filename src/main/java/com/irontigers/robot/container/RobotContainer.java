@@ -5,20 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot;
+package com.irontigers.robot.container;
 
 import static edu.wpi.first.wpilibj.XboxController.Button.kA;
 import static edu.wpi.first.wpilibj.XboxController.Button.kB;
 import static edu.wpi.first.wpilibj.XboxController.Button.kBack;
-import static edu.wpi.first.wpilibj.XboxController.Button.kBumperLeft;
-import static edu.wpi.first.wpilibj.XboxController.Button.kBumperRight;
 import static edu.wpi.first.wpilibj.XboxController.Button.kStart;
 import static edu.wpi.first.wpilibj.XboxController.Button.kX;
 import static edu.wpi.first.wpilibj.XboxController.Button.kY;
 
 import java.util.function.BiConsumer;
 
-import com.irontigers.robot.Constants.Controllers;
+import com.irontigers.robot.Constants;
+import com.irontigers.robot.Robot;
 import com.irontigers.robot.old.commands.AutonomousDrive;
 import com.irontigers.robot.old.commands.JoystickDriveCommand;
 import com.irontigers.robot.old.commands.RotateTurret;
@@ -31,9 +30,6 @@ import com.irontigers.robot.old.subsystems.MagazineSystem;
 import com.irontigers.robot.old.subsystems.ShooterSystem;
 import com.irontigers.robot.old.subsystems.VisionSystem;
 import com.irontigers.robot.triggers.BallPresenceTrigger;
-import com.irontigers.robot.triggers.DPadButton;
-import com.irontigers.robot.triggers.DPadButton.DPadDirection;
-import com.irontigers.robot.util.CorrectXboxController;
 
 // import org.graalvm.compiler.lir.amd64.vector.AMD64VectorShuffle.ConstShuffleBytesOp;
 
@@ -63,40 +59,14 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private CorrectXboxController controller = new CorrectXboxController(Controllers.PORT);
-  private CorrectXboxController testController = new CorrectXboxController(Controllers.TEST_PORT);
-
-  private JoystickButton shootAllButton = new JoystickButton(controller, kA.value);
-  private JoystickButton shootOneButton = new JoystickButton(controller, kB.value);
-  private JoystickButton cancelShootingButton = new JoystickButton(controller, kY.value);
-  private JoystickButton startIntake = new JoystickButton(controller, kX.value);
-  private JoystickButton autoAimButton = new JoystickButton(controller, kBumperRight.value);
-
-  private JoystickButton incrementCountButton = new JoystickButton(controller, kStart.value);
-  private JoystickButton decrementCountButton = new JoystickButton(controller, kBack.value);
-
-  JoystickButton opengateButton = new JoystickButton(testController, kBumperRight.value);
-  JoystickButton closegateButton = new JoystickButton(testController, kBumperLeft.value);
-  //
-  //
-  //
-  //
-
-  //
-  //
-  //
-  //
-  private DPadButton turretLeftButton = new DPadButton(controller, DPadDirection.LEFT);
-  private DPadButton turretRightButton = new DPadButton(controller, DPadDirection.RIGHT);
-
-  private JoystickButton startAutonomousButton = new JoystickButton(controller, kBack.value);
+  private ButtonContainer buttons = new ButtonContainer();
 
   private DriveSystem driveSystem = new DriveSystem();
   private ShooterSystem shooterSystem = new ShooterSystem();
   private MagazineSystem magSystem = new MagazineSystem();
   private VisionSystem visionSystem = new VisionSystem();
 
-  private JoystickDriveCommand joyDrive = new JoystickDriveCommand(driveSystem, controller);
+  private JoystickDriveCommand joyDrive = new JoystickDriveCommand(driveSystem, buttons.controller);
   private AutonomousDrive autonomousDrive = new AutonomousDrive(driveSystem);
   private BallPresenceTrigger topBallSensor = new BallPresenceTrigger(magSystem.getTopBallSensor());
   private BallPresenceTrigger bottomBallSensor = new BallPresenceTrigger(magSystem.getBottomBallSensor());
@@ -138,20 +108,20 @@ public class RobotContainer {
    */
   
   private void configureButtonBindings() {
-    shootOneButton.whenPressed(shootOnceCommand);
-    shootAllButton.whenPressed(getShootAllCommand());
+    buttons.shootOne.whenPressed(shootOnceCommand);
+    buttons.shootAll.whenPressed(getShootAllCommand());
 
-    incrementCountButton.whenPressed(new InstantCommand(magSystem::incrementBalls));
-    decrementCountButton.whenPressed(new InstantCommand(magSystem::decrementBalls));
+    buttons.incrementCount.whenPressed(new InstantCommand(magSystem::incrementBalls));
+    buttons.decrementCount.whenPressed(new InstantCommand(magSystem::decrementBalls));
 
-    turretLeftButton.whenHeld(new RotateTurret(shooterSystem, RotateTurret.Direction.LEFT));
-    turretRightButton.whenHeld(new RotateTurret(shooterSystem, RotateTurret.Direction.RIGHT));
+    buttons.turretLeft.whenHeld(new RotateTurret(shooterSystem, RotateTurret.Direction.LEFT));
+    buttons.turretRight.whenHeld(new RotateTurret(shooterSystem, RotateTurret.Direction.RIGHT));
 
-    opengateButton.whenPressed(new InstantCommand(magSystem::openGate, magSystem));
-    closegateButton.whenPressed(new InstantCommand(magSystem::closeGate, magSystem));
+    buttons.openGate.whenPressed(new InstantCommand(magSystem::openGate, magSystem));
+    buttons.closeGate.whenPressed(new InstantCommand(magSystem::closeGate, magSystem));
 
-    // startIntake.whenPressed(voluntaryIntakeCommand());
-    cancelShootingButton.whenPressed(new InstantCommand(shooterSystem::stopFlywhel, shooterSystem));
+    // buttons.startIntake.whenPressed(voluntaryIntakeCommand());
+    buttons.cancelShooting.whenPressed(new InstantCommand(shooterSystem::stopFlywhel, shooterSystem));
 
     // visionSystem.disableLeds();
 
@@ -159,11 +129,11 @@ public class RobotContainer {
   }
 
   public boolean isTurretLeftButtonPressed() {
-    return turretLeftButton.get();
+    return buttons.turretLeft.get();
   }
 
   public boolean isTurretRightButtonPressed() {
-    return turretRightButton.get();
+    return buttons.turretRight.get();
   }
 
   /**
@@ -257,15 +227,15 @@ public class RobotContainer {
     // visionSystem.disableLeds();
     visionSystem.enableLeds();
     visionSystem.setToVision();
-    JoystickButton enableShooterButton = new JoystickButton(testController, kX.value);
-    JoystickButton disableMagButton = new JoystickButton(testController, kY.value);
-    JoystickButton shootButton = new JoystickButton(testController, kA.value);
-    JoystickButton stopShooterButton = new JoystickButton(testController, kB.value);
-    JoystickButton increaseFlywheelButton = new JoystickButton(testController, kStart.value);
-    JoystickButton decreaseFlywheelButton = new JoystickButton(testController, kBack.value);
+    JoystickButton enableShooterButton = new JoystickButton(buttons.testController, kX.value);
+    JoystickButton disableMagButton = new JoystickButton(buttons.testController, kY.value);
+    JoystickButton shootButton = new JoystickButton(buttons.testController, kA.value);
+    JoystickButton stopShooterButton = new JoystickButton(buttons.testController, kB.value);
+    JoystickButton increaseFlywheelButton = new JoystickButton(buttons.testController, kStart.value);
+    JoystickButton decreaseFlywheelButton = new JoystickButton(buttons.testController, kBack.value);
     
 
-    // turretLeftButton.whenPressed(shooterSystem.setTurretPower(0.5));
+    // buttons.turretLeftButton.whenPressed(shooterSystem.setTurretPower(0.5));
 
     enableShooterButton.whenPressed(() -> shooterSystem.setFlywheelPower(0.2), shooterSystem);
     disableMagButton.whenPressed(magSystem::disableMagazine, magSystem);
