@@ -5,35 +5,37 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot.commands;
+package com.irontigers.robot.old.commands;
 
-import com.irontigers.robot.subsystems.MagazineSystem;
+import com.irontigers.robot.Constants.Shooter;
+import com.irontigers.robot.old.subsystems.ShooterSystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class IntakeControl extends CommandBase {
-  MagazineSystem magSys;
-  /**
-   * Creates a new IntakeControl.
-   */
-  public IntakeControl(MagazineSystem magSys) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    this.magSys = magSys;
-    addRequirements(magSys);
-  }
+public class RunShooterAtSpeed extends CommandBase {
+  private ShooterSystem shooterSys;
+  private double targetSpeed;
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
+  /**
+   * Creates a new RunShooter.
+   */
+  public RunShooterAtSpeed(ShooterSystem shooterSys, double targetSpeed) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    this.shooterSys = shooterSys;
+    this.targetSpeed = targetSpeed;
+    addRequirements(shooterSys);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (magSys.getStoredBalls() < 3) {
-      magSys.enableIntake();
+    double speedError = Math.abs(targetSpeed - shooterSys.getFlywheelRPS());
+    double deltaPowScalar = speedError > 10.0 ? 1.0 : speedError / 10.0;
+
+    if (targetSpeed - shooterSys.getFlywheelRPS() > 0) {
+      shooterSys.setFlywheelPower(shooterSys.getFlywheelPower() + (Shooter.POWER_INCREMENT * deltaPowScalar));
     } else {
-      magSys.disableIntake();
+      shooterSys.setFlywheelPower(shooterSys.getFlywheelPower() - (Shooter.POWER_INCREMENT * deltaPowScalar));
     }
   }
 
@@ -45,6 +47,7 @@ public class IntakeControl extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // return shooterSys.getFlywheelPower() == 1 || shooterSys.isReadyToShoot();
     return false;
   }
 }

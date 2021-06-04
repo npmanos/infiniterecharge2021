@@ -5,19 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot.subsystems;
-
-import com.irontigers.robot.Constants.Drive;
+package com.irontigers.robot.old.subsystems;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
-import com.irontigers.robot.Constants;
+import com.irontigers.robot.Constants.Drive;
 import com.irontigers.robot.Robot;
-import com.irontigers.robot.sim.CANSparkMaxSim;
-import com.irontigers.robot.sim.DifferentialDriveCompat;
-import com.irontigers.robot.sim.NavXSim;
+import com.irontigers.robot.old.sim.CANSparkMaxSim;
+import com.irontigers.robot.old.sim.NavXSim;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
@@ -27,7 +24,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;

@@ -5,33 +5,29 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot.commands;
+package com.irontigers.robot.old.commands;
 
-import com.irontigers.robot.util.Utils;
-import com.irontigers.robot.subsystems.DriveSystem;
+import com.irontigers.robot.Constants.Shooter;
+import com.irontigers.robot.old.subsystems.ShooterSystem;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class JoystickDriveCommand extends CommandBase {
-  private DriveSystem driveSys;
-  private XboxController controller;
+public class RunShooter extends CommandBase {
+  private ShooterSystem shooterSys;
 
   /**
-   * Creates a new JoystickDriveCommand.
+   * Creates a new RunShooter.
    */
-  public JoystickDriveCommand(DriveSystem driveSys, XboxController controller) {
+  public RunShooter(ShooterSystem shooterSys) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.driveSys = driveSys;
-    this.controller = controller;
-    addRequirements(driveSys);
+    this.shooterSys = shooterSys;
+    addRequirements(shooterSys);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    driveSys.drive(Utils.deadZone(controller.getY(Hand.kLeft)), Utils.deadZone(controller.getX(Hand.kLeft)));
+    shooterSys.setFlywheelPower(shooterSys.getFlywheelPower() + Shooter.POWER_INCREMENT);
   }
 
   // Called once the command ends or is interrupted.
@@ -42,6 +38,7 @@ public class JoystickDriveCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return shooterSys.getFlywheelPower() == 1 || shooterSys.isReadyToShoot();
+    // return false;
   }
 }

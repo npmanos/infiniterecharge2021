@@ -5,63 +5,66 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot.commands;
+package com.irontigers.robot.old.commands;
 
-import com.irontigers.robot.subsystems.DriveSystem;
-import com.irontigers.robot.subsystems.ShooterSystem;
+import com.irontigers.robot.old.subsystems.DriveSystem;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Transform2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class AutoTurnTurret extends CommandBase {
-  /**
-   * Creates a new AutoTurnTurret.
-   */
+public class AutonomousDrive extends CommandBase {
   private DriveSystem driveSys;
-  private Pose2d currentLoc;
-  private Pose2d targetLoc;
-  private ShooterSystem shooterSys;
-  private double targetAngle;
+  private Pose2d currentPos;
+  private Pose2d endPos;
 
-  public AutoTurnTurret(DriveSystem driveSys, ShooterSystem shooterSys) {
+  private double distanceError;
+
+  /**
+   * Creates a new AutonomousDrive.
+   */
+  public AutonomousDrive(DriveSystem driveSys) {
     this.driveSys = driveSys;
-    this.shooterSys = shooterSys;
-    addRequirements(shooterSys);
+    addRequirements(driveSys);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    currentLoc = driveSys.getRobotPosition();
-    targetLoc = new Pose2d(Units.feetToMeters(52.4375), Units.feetToMeters(18.645), Rotation2d.fromDegrees(0));
-    Pose2d poseDifference = currentLoc.relativeTo(targetLoc);
-    targetAngle = Math.atan2(poseDifference.getTranslation().getY(), poseDifference.getTranslation().getX());
+    driveSys.initStartingPose();
+    currentPos = driveSys.getRobotPosition();
+    endPos = currentPos.plus(new Transform2d(new Translation2d(Units.feetToMeters(-4), 0), Rotation2d.fromDegrees(0)));
+    distanceError = currentPos.relativeTo(endPos).getTranslation().getX();
+
   }
-  
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      // BANG-BANG Control
-      shooterSys.setTurretPower(.2);
+    currentPos = driveSys.getRobotPosition();
+    distanceError = currentPos.relativeTo(endPos).getTranslation().getX();
+    driveSys.drive(-0.3, 0);
+    SmartDashboard.putNumber("Auto dist error", distanceError);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    shooterSys.setTurretPower(0.0);
+  public void end(final boolean interrupted) {
+    driveSys.drive(0, 0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-     if (shooterSys.getTurretAngle() < targetAngle - 3.0) { // 3 degree deadband, should make it a constant
+    if (distanceError >= 0) {
+      return false;
+    } else {
       return true;
-     } else {
-       return false;
-     }
+    }
   }
 }

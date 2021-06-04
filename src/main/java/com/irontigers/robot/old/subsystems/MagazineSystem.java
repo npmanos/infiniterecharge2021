@@ -5,19 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot.subsystems;
+package com.irontigers.robot.old.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.irontigers.robot.Constants.Magazine;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.MedianFilter;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MagazineSystem extends SubsystemBase {
@@ -37,8 +34,6 @@ public class MagazineSystem extends SubsystemBase {
   private MedianFilter botttomBallFilter;
 
   private boolean ballGateOpen = false;
-  private boolean ballGateInitComplete = false;
-
   /**
    * Creates a new MagazineSystem.
    */

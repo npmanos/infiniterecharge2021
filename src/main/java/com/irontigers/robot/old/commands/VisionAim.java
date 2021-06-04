@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot.commands;
+package com.irontigers.robot.old.commands;
 
-import static com.irontigers.robot.Constants.Shooter;
-import com.irontigers.robot.subsystems.ShooterSystem;
-import com.irontigers.robot.subsystems.VisionSystem;
+import com.irontigers.robot.Constants.Shooter;
+import com.irontigers.robot.old.subsystems.ShooterSystem;
+import com.irontigers.robot.old.subsystems.VisionSystem;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -21,8 +21,7 @@ public class VisionAim extends CommandBase {
 
   private ShooterSystem shooterSys;
   private VisionSystem visionSys;
-  private double setpoint; 
-  private boolean targetDetected;
+  private double setpoint;
   private boolean turnTurret;
 
   /**
@@ -39,7 +38,7 @@ public class VisionAim extends CommandBase {
   public void initialize() {
     // visionSys.enableLeds();
     visionSys.setToVision();
-    targetDetected = visionSys.seesTarget();
+    visionSys.seesTarget();
     setpoint = shooterSys.getTurretAngle() + visionSys.getXAngle();
     turnTurret = true;
   }
@@ -52,8 +51,7 @@ public class VisionAim extends CommandBase {
     SmartDashboard.putNumber("AutoAim Target", setpoint);
     SmartDashboard.putNumber("AutoAim Angle", shooterSys.getTurretAngle());
 
-    double speed = 
-      Math.abs(setpoint - shooterSys.getTurretAngle()) < 7.5 
+    double speed = Math.abs(setpoint - shooterSys.getTurretAngle()) < 7.5
         ? (0.033 * (Math.abs(setpoint - shooterSys.getTurretAngle()) / 7.5)) + 0.067
         : Shooter.AUTO_TURRET_SPD_FAST;
 
@@ -61,7 +59,7 @@ public class VisionAim extends CommandBase {
       if (setpoint > shooterSys.getTurretAngle()) {
         shooterSys.setTurretPower(speed);
       } else {
-          shooterSys.setTurretPower(-speed);
+        shooterSys.setTurretPower(-speed);
       }
     } else {
       shooterSys.stopTurret();
@@ -79,22 +77,22 @@ public class VisionAim extends CommandBase {
   @Override
   public boolean isFinished() {
     // if (!targetDetected)
-    //     return true;
+    // return true;
 
     if (Math.abs(shooterSys.getTurretAngle()) >= Shooter.MAX_TURRET_ANGLE) {
       return true;
     }
 
     if (Math.abs(setpoint - shooterSys.getTurretAngle()) < 0.21) { // 0.22 degree deadband, should make it a constant
-        turnTurret = false;
-        if (Math.abs(visionSys.getXAngle()) < 0.21) {
-          return true;
-        } else {
-          setpoint = shooterSys.getTurretAngle() + visionSys.getXAngle();
-          turnTurret = true;
-          return false;
-        }
-        // return true;
+      turnTurret = false;
+      if (Math.abs(visionSys.getXAngle()) < 0.21) {
+        return true;
+      } else {
+        setpoint = shooterSys.getTurretAngle() + visionSys.getXAngle();
+        turnTurret = true;
+        return false;
+      }
+      // return true;
     } else {
       turnTurret = true;
       return false;

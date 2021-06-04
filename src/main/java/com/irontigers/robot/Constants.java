@@ -7,9 +7,6 @@
 
 package com.irontigers.robot;
 
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.util.Units;
 
@@ -87,7 +84,7 @@ public final class Constants {
 
     public static final class VISION {
         public static final double HEIGHT = 37.5;
-        private static final double yOffset = 0.830619;
+        // private static final double yOffset = 0.830619;
     }
 
     public static final class Controllers {

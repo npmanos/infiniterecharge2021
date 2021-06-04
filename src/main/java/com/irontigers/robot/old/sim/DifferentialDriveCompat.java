@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package com.irontigers.robot.sim;
+package com.irontigers.robot.old.sim;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpiutil.math.MathUtil;
-
 
 public class DifferentialDriveCompat extends DifferentialDrive {
     public static final double kDefaultQuickStopThreshold = 0.2;
@@ -43,7 +42,7 @@ public class DifferentialDriveCompat extends DifferentialDrive {
     public void arcadeDrive(double xSpeed, double zRotation) {
         arcadeDrive(xSpeed, zRotation, true);
     }
-    
+
     @Override
     public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
         if (!m_reported) {

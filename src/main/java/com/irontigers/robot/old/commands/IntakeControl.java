@@ -5,38 +5,47 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot.commands;
+package com.irontigers.robot.old.commands;
 
-import com.irontigers.robot.Constants.Shooter;
-import com.irontigers.robot.subsystems.ShooterSystem;
+import com.irontigers.robot.old.subsystems.MagazineSystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class StopShooter extends CommandBase {
-  private ShooterSystem shooterSys;
+public class IntakeControl extends CommandBase {
+  MagazineSystem magSys;
+
   /**
-   * Creates a new StopShooter.
+   * Creates a new IntakeControl.
    */
-  public StopShooter(ShooterSystem shooterSys) {
+  public IntakeControl(MagazineSystem magSys) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.shooterSys = shooterSys;
+    this.magSys = magSys;
+    addRequirements(magSys);
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shooterSys.setFlywheelPower(shooterSys.getFlywheelPower() - Shooter.POWER_INCREMENT);
+    if (magSys.getStoredBalls() < 3) {
+      magSys.enableIntake();
+    } else {
+      magSys.disableIntake();
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooterSys.stopFlywhel();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return shooterSys.getFlywheelPower() <= 0;
+    return false;
   }
 }

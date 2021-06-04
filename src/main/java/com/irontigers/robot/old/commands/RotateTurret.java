@@ -5,49 +5,60 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot.commands;
+package com.irontigers.robot.old.commands;
 
 import com.irontigers.robot.Constants.Shooter;
-import com.irontigers.robot.subsystems.ShooterSystem;
+import com.irontigers.robot.old.subsystems.ShooterSystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class RunShooterAtSpeed extends CommandBase {
+public class RotateTurret extends CommandBase {
+  public static enum Direction {
+    LEFT, RIGHT
+  }
+
   private ShooterSystem shooterSys;
-  private double targetSpeed;
+  private Direction direction;
 
   /**
-   * Creates a new RunShooter.
+   * Creates a new RotateTurret.
    */
-  public RunShooterAtSpeed(ShooterSystem shooterSys, double targetSpeed) {
+  public RotateTurret(ShooterSystem shooterSys, Direction direction) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.shooterSys = shooterSys;
-    this.targetSpeed = targetSpeed;
     addRequirements(shooterSys);
+    this.shooterSys = shooterSys;
+    this.direction = direction;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double speedError = Math.abs(targetSpeed - shooterSys.getFlywheelRPS());
-    double deltaPowScalar = speedError > 10.0 ? 1.0 : speedError / 10.0;
-
-    if (targetSpeed - shooterSys.getFlywheelRPS() > 0) {
-      shooterSys.setFlywheelPower(shooterSys.getFlywheelPower() + (Shooter.POWER_INCREMENT * deltaPowScalar));
-    } else {
-      shooterSys.setFlywheelPower(shooterSys.getFlywheelPower() - (Shooter.POWER_INCREMENT * deltaPowScalar));
+    switch (direction) {
+      case RIGHT:
+        shooterSys.setTurretPower(Shooter.DEFAULT_TURRET_SPD);
+        break;
+      case LEFT:
+        shooterSys.setTurretPower(-Shooter.DEFAULT_TURRET_SPD);
+        break;
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    shooterSys.stopTurret();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // return shooterSys.getFlywheelPower() == 1 || shooterSys.isReadyToShoot();
-    return false;
+    switch (direction) {
+      case RIGHT:
+        return !(shooterSys.getTurretAngle() < Shooter.MAX_TURRET_ANGLE);
+      case LEFT:
+        return !(-shooterSys.getTurretAngle() < Shooter.MAX_TURRET_ANGLE);
+      default:
+        return true;
+    }
   }
 }

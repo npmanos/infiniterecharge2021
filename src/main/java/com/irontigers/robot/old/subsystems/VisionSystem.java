@@ -5,18 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.irontigers.robot.subsystems;
+package com.irontigers.robot.old.subsystems;
+
+import com.irontigers.robot.Constants.GameField;
+import com.irontigers.robot.Constants.VISION;
+import com.irontigers.robot.LedController;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static com.irontigers.robot.Constants.VISION;
-
-import com.irontigers.robot.LedController;
-
-import static com.irontigers.robot.Constants.GameField;
 
 public class VisionSystem extends SubsystemBase {
   private NetworkTable limelight;
@@ -75,7 +73,6 @@ public class VisionSystem extends SubsystemBase {
     seesTarget = limelight.getEntry("tv").getDouble(0) == 1;
     xAngle = limelight.getEntry("tx").getDouble(0);
     yAngle = limelight.getEntry("ty").getDouble(0);
-    
 
     SmartDashboard.putNumber("LimeLightDistanceInches", getDistanceToTarget());
     SmartDashboard.putBoolean("Limelight Sees Target", seesTarget);

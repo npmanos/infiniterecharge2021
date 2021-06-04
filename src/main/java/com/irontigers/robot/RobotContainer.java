@@ -10,49 +10,41 @@ package com.irontigers.robot;
 import static edu.wpi.first.wpilibj.XboxController.Button.kA;
 import static edu.wpi.first.wpilibj.XboxController.Button.kB;
 import static edu.wpi.first.wpilibj.XboxController.Button.kBack;
-import static edu.wpi.first.wpilibj.XboxController.Button.kBumperRight;
 import static edu.wpi.first.wpilibj.XboxController.Button.kBumperLeft;
+import static edu.wpi.first.wpilibj.XboxController.Button.kBumperRight;
 import static edu.wpi.first.wpilibj.XboxController.Button.kStart;
 import static edu.wpi.first.wpilibj.XboxController.Button.kX;
 import static edu.wpi.first.wpilibj.XboxController.Button.kY;
 
-import java.time.Instant;
 import java.util.function.BiConsumer;
 
 import com.irontigers.robot.Constants.Controllers;
-import com.irontigers.robot.commands.AutonomousDrive;
-import com.irontigers.robot.commands.JoystickDriveCommand;
-import com.irontigers.robot.commands.RotateTurret;
-import com.irontigers.robot.commands.RunShooter;
-import com.irontigers.robot.commands.Shoot;
-import com.irontigers.robot.commands.StopShooter;
-import com.irontigers.robot.commands.VisionAim;
-import com.irontigers.robot.subsystems.CorrectXboxController;
-import com.irontigers.robot.subsystems.DriveSystem;
-import com.irontigers.robot.subsystems.MagazineSystem;
-import com.irontigers.robot.subsystems.ShooterSystem;
-import com.irontigers.robot.subsystems.VisionSystem;
+import com.irontigers.robot.old.commands.AutonomousDrive;
+import com.irontigers.robot.old.commands.JoystickDriveCommand;
+import com.irontigers.robot.old.commands.RotateTurret;
+import com.irontigers.robot.old.commands.RunShooter;
+import com.irontigers.robot.old.commands.Shoot;
+import com.irontigers.robot.old.commands.StopShooter;
+import com.irontigers.robot.old.commands.VisionAim;
+import com.irontigers.robot.old.subsystems.DriveSystem;
+import com.irontigers.robot.old.subsystems.MagazineSystem;
+import com.irontigers.robot.old.subsystems.ShooterSystem;
+import com.irontigers.robot.old.subsystems.VisionSystem;
 import com.irontigers.robot.triggers.BallPresenceTrigger;
 import com.irontigers.robot.triggers.DPadButton;
 import com.irontigers.robot.triggers.DPadButton.DPadDirection;
-
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import com.irontigers.robot.util.CorrectXboxController;
 
 // import org.graalvm.compiler.lir.amd64.vector.AMD64VectorShuffle.ConstShuffleBytesOp;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.MedianFilter;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -60,7 +52,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
